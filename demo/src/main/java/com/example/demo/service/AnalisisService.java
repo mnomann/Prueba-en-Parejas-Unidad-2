@@ -5,12 +5,18 @@ import org.springframework.stereotype.Service;
 import com.example.demo.model.Usuario;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class AnalisisService {
@@ -21,15 +27,23 @@ public class AnalisisService {
 
     private List<Usuario> usuarios = new ArrayList<>();
 
+    @Value("classpath:dataset2.csv")
+    private Resource dataFile; // Spring inyectará el recurso del classpath aquí
+
     public void cargarYProcesarDatos() throws IOException {
-        String data = Files.readString(Paths.get("demo\\src\\main\\resources\\dataset2.csv"));
+        // Usamos dataFile.getContentAsString(StandardCharsets.UTF_8)
+        // para obtener el contenido como String de forma segura y portable.
+        String data = dataFile.getContentAsString(StandardCharsets.UTF_8); 
+        
         String[] lineas = data.split("\n");
 
         for (int i = 1; i < lineas.length; i++) {
             try {
-                Usuario usuario = parsearLinea(lineas[i]);
+                Usuario usuario = parsearLinea(lineas[i].trim()); // Agregué .trim() por si acaso
                 usuarios.add(usuario);
             } catch (Exception e) {
+                // Considera loggear el error para saber qué línea falló
+                System.err.println("Error al parsear línea: " + lineas[i] + ". Causa: " + e.getMessage());
             }
         }
 
