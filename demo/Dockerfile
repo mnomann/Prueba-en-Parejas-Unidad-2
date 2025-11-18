@@ -27,7 +27,7 @@ ARG JAR_FILE=/app/target/*.jar
 COPY --from=build ${JAR_FILE} app.jar
 
 # Puerto por defecto de Spring Boot
-EXPOSE 8080
+EXPOSE 3001
 
 # Comando para ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "/app.jar"]
